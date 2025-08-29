@@ -1,11 +1,6 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-
-@login_required
-def dashboard(request):
-    return render(request, "users/dashboard.html")
 
 def index(request):
     return render(request, "users/index.html")
