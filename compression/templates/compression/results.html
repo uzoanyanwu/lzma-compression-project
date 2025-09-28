@@ -50,32 +50,111 @@
           <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
             <div class="flex flex-wrap justify-between gap-3 p-4">
               <p class="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">Compression Results</p>
+              <a href="{% url 'dashboard' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors">
+                <span class="truncate">Compress More Files</span>
+              </a>
             </div>
+
+            <!-- File Info -->
+            <div class="px-4 pb-3">
+              <div class="bg-[#f8fafc] rounded-lg p-4 border border-[#e1e7ef]">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="text-[#3d98f4]">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM152,88V44l44,44Z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-[#111418] text-lg font-medium">{{ result.file.original_filename }}</p>
+                    <p class="text-[#60758a] text-sm">Compressed to: {{ result.compressed_filename }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="p-4 grid grid-cols-[20%_1fr] gap-x-6">
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
                 <p class="text-[#60758a] text-sm font-normal leading-normal">Original Size</p>
-                <p class="text-[#111418] text-sm font-normal leading-normal">120 MB</p>
+                <p class="text-[#111418] text-sm font-normal leading-normal">
+                  {% load custom_filters %}
+                  {{ result.file.original_file_size|filesizeformat }}
+                </p>
               </div>
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
                 <p class="text-[#60758a] text-sm font-normal leading-normal">Compressed Size</p>
-                <p class="text-[#111418] text-sm font-normal leading-normal">80 MB</p>
+                <p class="text-[#111418] text-sm font-normal leading-normal">
+                  {{ result.compressed_file_size|filesizeformat }}
+                </p>
               </div>
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
                 <p class="text-[#60758a] text-sm font-normal leading-normal">Compression Ratio</p>
-                <p class="text-[#111418] text-sm font-normal leading-normal">33.3%</p>
+                <p class="text-[#111418] text-sm font-normal leading-normal">
+                  <span class="{% if result.compression_percentage > 0 %}text-green-600{% else %}text-red-600{% endif %} font-medium">
+                    {{ result.compression_percentage }}% reduction
+                  </span>
+                </p>
               </div>
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
                 <p class="text-[#60758a] text-sm font-normal leading-normal">Compression Time</p>
-                <p class="text-[#111418] text-sm font-normal leading-normal">2 minutes</p>
+                <p class="text-[#111418] text-sm font-normal leading-normal">{{ result.formatted_compression_time }}</p>
+              </div>
+              <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
+                <p class="text-[#60758a] text-sm font-normal leading-normal">Compressed On</p>
+                <p class="text-[#111418] text-sm font-normal leading-normal">{{ result.timestamp|date:"F d, Y g:i A" }}</p>
               </div>
             </div>
-            <div class="flex px-4 py-3 justify-start">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+
+            <!-- Compression Statistics -->
+            <div class="px-4 pb-4">
+              <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
+                <h4 class="text-[#111418] font-medium mb-2">Compression Statistics</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p class="text-[#60758a]">Space Saved:</p>
+                    <p class="text-[#111418] font-medium">
+                      {{ result.file.original_file_size|add:"-"|add:result.compressed_file_size|filesizeformat }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[#60758a]">Algorithm Used:</p>
+                    <p class="text-[#111418] font-medium">LZMA (Preset 6)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex px-4 py-3 justify-start gap-3">
+              <a href="{% url 'download_compressed_file' result.file.id %}"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#2d78d4] transition-colors"
               >
                 <span class="truncate">Download Compressed File</span>
+              </a>
+              <button onclick="copyDownloadLink()"
+                class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors"
+              >
+                <span class="truncate">Copy Download Link</span>
               </button>
             </div>
+
+            <script>
+              function copyDownloadLink() {
+                const downloadUrl = "{{ request.build_absolute_uri }}{% url 'download_compressed_file' result.file.id %}";
+                navigator.clipboard.writeText(downloadUrl).then(() => {
+                  // Show temporary success message
+                  const button = event.target.closest('button');
+                  const originalText = button.querySelector('span').textContent;
+                  button.querySelector('span').textContent = 'Copied!';
+                  button.classList.add('bg-green-100', 'text-green-700');
+
+                  setTimeout(() => {
+                    button.querySelector('span').textContent = originalText;
+                    button.classList.remove('bg-green-100', 'text-green-700');
+                  }, 2000);
+                }).catch(err => {
+                  console.error('Failed to copy: ', err);
+                });
+              }
+            </script>
           </div>
         </div>
       </div>
