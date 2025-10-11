@@ -1,103 +1,48 @@
-<html>
-  <head>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link
-      rel="stylesheet"
-      as="style"
-      onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
-    />
+{% extends "base.html" %}
 
-    <title>DataCompress</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  </head>
-  <body>
-    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
-      <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] px-10 py-3">
-          <div class="flex items-center gap-4 text-[#111418]">
-            <div class="size-4">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clip-path="url(#clip0_6_319)">
-                  <path
-                    d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                    fill="currentColor"
-                  ></path>
-                </g>
-                <defs>
-                  <clipPath id="clip0_6_319"><rect width="48" height="48" fill="white"></rect></clipPath>
-                </defs>
-              </svg>
-            </div>
-            <h2 class="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em]">DataCompress</h2>
+{% block content %}
+<div class="px-40 flex flex-1 justify-center py-5">
+  <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+    <div class="@container">
+      <div class="@[480px]:p-4">
+        <div
+          class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4"
+          style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCMClqvrUQQyx298aeJBfxX7Jqu-kKwVh7MV2u9DOt3rpLszFouPQOjuQTyGD6G3pSTJo3ub1AN0yCLO4Qnno5FT5HVqAqSa87k5maLcX2EcDLGObK3p2WMQnHE6ffKULDILeba9bHs-s8i2upqv47nfzS5VHV0NYUSVsGZI5WW4LgLJyN5DIWTMQSrS9q1x1sejzyCwe1JeIq706KC6IbVpIH0vwHjo5Yll0UCA2DCSzfK3a2_Z6vSKUT6k_0JyR16loAYI04PvY4O");'
+        >
+          <div class="flex flex-col gap-2 text-center">
+            <h1
+              class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+            >
+              Compress Your Files and Folders with Ease
+            </h1>
+            <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+              DataCompress offers a seamless solution for reducing the size of your files and folders, making them easier to store and share. Get started today and
+              experience the difference.
+            </h2>
           </div>
-            <div class="flex gap-2">
-              <a href="{% url 'signup' %}">
+          <div class="flex-wrap gap-3 flex justify-center">
+            <a href="{% url 'signup' %}">
               <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
               >
                 <span class="truncate">Get Started</span>
               </button>
-              </a>
-              <a href="{% url 'login' %}">
+            </a>
+            <a href="{% url 'login' %}">
               <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em]"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
               >
                 <span class="truncate">Log In</span>
               </button>
-              </a>
-            </div>
-        </header>
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div class="@container">
-              <div class="@[480px]:p-4">
-                <div
-                  class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4"
-                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCMClqvrUQQyx298aeJBfxX7Jqu-kKwVh7MV2u9DOt3rpLszFouPQOjuQTyGD6G3pSTJo3ub1AN0yCLO4Qnno5FT5HVqAqSa87k5maLcX2EcDLGObK3p2WMQnHE6ffKULDILeba9bHs-s8i2upqv47nfzS5VHV0NYUSVsGZI5WW4LgLJyN5DIWTMQSrS9q1x1sejzyCwe1JeIq706KC6IbVpIH0vwHjo5Yll0UCA2DCSzfK3a2_Z6vSKUT6k_0JyR16loAYI04PvY4O");'
-                >
-                  <div class="flex flex-col gap-2 text-center">
-                    <h1
-                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
-                    >
-                      Compress Your Files and Folders with Ease
-                    </h1>
-                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                      DataCompress offers a seamless solution for reducing the size of your files and folders, making them easier to store and share. Get started today and
-                      experience the difference.
-                    </h2>
-                  </div>
-                  <div class="flex-wrap gap-3 flex justify-center">
-                    <a href="{% url 'signup' %}"></a>
-                    <button
-                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-                    >
-                      <span class="truncate">Get Started</span>
-                    </button>
-                    </a>
-                    <a href="{% url 'login' %}">
-                    <button
-                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-                    >
-                      <span class="truncate">Log In</span>
-                    </button>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </a>
           </div>
         </div>
-        <footer class="flex justify-center">
-          <div class="flex max-w-[960px] flex-1 flex-col">
-            <footer class="flex flex-col gap-6 px-5 py-10 text-center @container">
-              <p class="text-[#60758a] text-base font-normal leading-normal">@ 2025 DataCompress. All rights reserved.</p>
-            </footer>
-          </div>
-        </footer>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% include "includes/footer.html" %}
+{% endblock %}
