@@ -1,9 +1,11 @@
 from django import template
-from django.template.defaultfilters import filesizeformat
 
 register = template.Library()
 
 @register.filter
-def custom_filesizeformat(bytes_value):
-    """Custom file size formatting"""
-    return filesizeformat(bytes_value)
+def subtract(value, arg):
+    """Subtract arg from value"""
+    try:
+        return int(value) - int(arg)
+    except (ValueError, TypeError):
+        return 0

@@ -69,13 +69,42 @@
                   <div>
                     <p class="text-[#60758a]">Space Saved:</p>
                     <p class="text-[#111418] font-medium">
-                      {{ result.file.original_file_size|add:"-"|add:result.compressed_file_size|filesizeformat }}
+                      {{ result.file.original_file_size|subtract:result.compressed_file_size|filesizeformat }}
                     </p>
                   </div>
                   <div>
                     <p class="text-[#60758a]">Algorithm Used:</p>
                     <p class="text-[#111418] font-medium">LZMA (Preset 6)</p>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Decompression Instructions -->
+            <div class="px-4 pb-4">
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                <h4 class="text-[#111418] font-medium mb-2 flex items-center gap-2">
+                  <svg width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path>
+                  </svg>
+                  How to Decompress Your File
+                </h4>
+                <div class="text-sm text-[#60758a] space-y-2">
+                  <p>Your file has been compressed using LZMA compression. To restore the original file:</p>
+                  <ul class="list-disc list-inside space-y-1 ml-2">
+                    <li><strong>Use any LZMA/XZ decompression tool</strong> to decompress the file.</li>
+                    <li><strong>Decompression options:</strong>
+                      <ul class="list-disc list-inside ml-4 mt-1 space-y-1">
+                        <li>Windows: Right-click and extract with 7-Zip, WinRAR, or PeaZip</li>
+                        <li>Mac: Double-click to extract with The Unarchiver, Keka, or use Terminal: <code class="bg-gray-100 px-1 rounded text-xs">xz -d filename.xz</code></li>
+                        <li>Linux: Use file manager or Terminal: <code class="bg-gray-100 px-1 rounded text-xs">xz -d filename.xz</code></li>
+                      </ul>
+                    </li>
+                    <li><strong>Result:</strong> The decompressed file will automatically have its original filename and extension restored</li>
+                    {% if '.zip.xz' in result.compressed_filename %}
+                    <li><strong>Note:</strong> This file contains multiple files. After decompression, you'll get a ZIP file that you can extract normally.</li>
+                    {% endif %}
+                  </ul>
                 </div>
               </div>
             </div>

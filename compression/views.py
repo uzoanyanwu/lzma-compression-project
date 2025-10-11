@@ -95,8 +95,15 @@ def compress_single_file(file_record):
     # Compress using LZMA
     compressed_data = lzma.compress(data, preset=6)  # Preset 6 is default for good compression
 
-    # Create compressed filename
-    compressed_filename = f"{os.path.splitext(file_record.original_filename)[0]}.xz"
+    # Create compressed filename that preserves original extension information
+    # Format: originalname.original_ext.xz (so when decompressed, it becomes originalname.original_ext)
+    original_name, original_ext = os.path.splitext(file_record.original_filename)
+    if original_ext:
+        # If there's an extension, include it in the compressed filename
+        compressed_filename = f"{original_name}{original_ext}.xz"
+    else:
+        # If no extension, just add .xz
+        compressed_filename = f"{file_record.original_filename}.xz"
 
     # Save compressed file
     compressed_dir = os.path.join(settings.MEDIA_ROOT, 'compressed', str(file_record.user.id))
@@ -148,13 +155,14 @@ def compress_multiple_files(file_records):
     # Create a combined filename
     if len(file_records) <= 3:
         filenames = [os.path.splitext(f.original_filename)[0] for f in file_records]
-        compressed_filename = f"{'_'.join(filenames)}.xz"
+        base_name = '_'.join(filenames)
+        compressed_filename = f"{base_name}.xz"
     else:
-        compressed_filename = f"{len(file_records)}_files_compressed.xz"
+        compressed_filename = f"{len(file_records)}_files_archive.xz"
 
     # Ensure filename isn't too long
     if len(compressed_filename) > 200:
-        compressed_filename = f"{len(file_records)}_files_compressed.xz"
+        compressed_filename = f"{len(file_records)}_files_archive.xz"
 
     # Save compressed file
     user_id = file_records[0].user.id
