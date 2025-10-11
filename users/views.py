@@ -3,9 +3,16 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import redirect, render
 
 def index(request):
+    # Redirect authenticated users to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, "users/index.html")
 
 def login_view(request):
+    # Redirect authenticated users to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -20,6 +27,10 @@ def login_view(request):
     return render(request, "users/login.html", {"form": form})
 
 def signup(request):
+    # Redirect authenticated users to dashboard
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -27,6 +38,6 @@ def signup(request):
             login(request, user)
             return redirect("dashboard")
     else:
-        form = UserCreationForm()   
+        form = UserCreationForm()
     return render(request, "users/signup.html", {"form": form})
 
