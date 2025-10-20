@@ -129,7 +129,7 @@
 {% block scripts %}
 <script>
   function copyDownloadLink() {
-    const downloadUrl = "{{ request.build_absolute_uri }}{% url 'download_compressed_file' result.file.id %}";
+    const downloadUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'download_compressed_file' result.file.id %}";
     navigator.clipboard.writeText(downloadUrl).then(() => {
       // Show temporary success message
       const button = event.target.closest('button');
