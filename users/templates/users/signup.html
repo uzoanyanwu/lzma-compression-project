@@ -1,23 +1,18 @@
-{% load form_filters %}
 {% extends "base_form.html" %}
+{% load form_filters %}
 
 {% block form_content %}
 <h2 class="text-[#111418] tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Create your account</h2>
 <form method="post">
   {% csrf_token %}
-  {% if form.errors %}
-    <div class="px-4 py-3">
-      <div class="text-red-500 text-sm">
-        {{ form.errors }}
-      </div>
-    </div>
-  {% endif %}
   <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
     <label class="flex flex-col min-w-40 flex-1">
       <p class="text-[#111418] text-base font-medium leading-normal pb-2">Username</p>
       {{ form.username|addclass:"form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-14 placeholder:text-[#60758a] p-[15px] text-base font-normal leading-normal" }}
       {% if form.username.errors %}
-        <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+        {% for error in form.username.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
       {% endif %}
     </label>
   </div>
@@ -26,7 +21,9 @@
       <p class="text-[#111418] text-base font-medium leading-normal pb-2">Password</p>
       {{ form.password1|addclass:"form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-14 placeholder:text-[#60758a] p-[15px] text-base font-normal leading-normal" }}
       {% if form.password1.errors %}
-        <p class="text-red-500 text-sm mt-1">{{ form.password1.errors.0 }}</p>
+        {% for error in form.password1.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
       {% endif %}
     </label>
   </div>
@@ -35,7 +32,9 @@
       <p class="text-[#111418] text-base font-medium leading-normal pb-2">Confirm Password</p>
       {{ form.password2|addclass:"form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-14 placeholder:text-[#60758a] p-[15px] text-base font-normal leading-normal" }}
       {% if form.password2.errors %}
-        <p class="text-red-500 text-sm mt-1">{{ form.password2.errors.0 }}</p>
+        {% for error in form.password2.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+        {% endfor %}
       {% endif %}
     </label>
   </div>
