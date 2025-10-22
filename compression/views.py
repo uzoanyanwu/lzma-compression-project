@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.urls import reverse
+from django.utils import timezone
 import os
 import lzma
 import time
@@ -216,6 +217,15 @@ def download_compressed_file(request, file_id):
         file_record = File.objects.get(id=file_id, user=request.user)
         compression_result = CompressionResult.objects.get(file=file_record)
 
+        # Check if file has already been downloaded
+        if compression_result.downloaded:
+            messages.warning(
+                request,
+                f'This file was already downloaded on {compression_result.downloaded_at.strftime("%B %d, %Y at %I:%M %p")}. '
+                'The files have been deleted from our servers for your security and privacy.'
+            )
+            return redirect('dashboard')
+
         compressed_path = os.path.join(
             settings.MEDIA_ROOT,
             'compressed',
@@ -224,15 +234,61 @@ def download_compressed_file(request, file_id):
         )
 
         if not os.path.exists(compressed_path):
-            raise Http404("Compressed file not found")
+            messages.error(request, "Compressed file not found on server.")
+            return redirect('dashboard')
 
+        # Read file content before deletion
         with open(compressed_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename="{compression_result.compressed_filename}"'
-            return response
+            file_content = f.read()
+
+        # Mark as downloaded
+        compression_result.downloaded = True
+        compression_result.downloaded_at = timezone.now()
+        compression_result.save()
+
+        # Delete the compressed file
+        try:
+            os.remove(compressed_path)
+        except OSError as e:
+            print(f"Error deleting compressed file: {e}")
+
+        # Delete the original uploaded file(s)
+        # Check if this was a multiple file upload (file_path points to compressed file)
+        if file_record.file_path != compressed_path:
+            # Single file or individual files from multiple upload
+            if os.path.exists(file_record.file_path):
+                try:
+                    os.remove(file_record.file_path)
+                except OSError as e:
+                    print(f"Error deleting original file: {e}")
+
+        # For multiple file uploads, try to clean up the upload directory
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads', str(request.user.id))
+        if os.path.exists(upload_dir):
+            try:
+                # Remove any files that were uploaded at the same time (within 10 seconds)
+                upload_time = file_record.upload_timestamp.timestamp()
+                for filename in os.listdir(upload_dir):
+                    file_path = os.path.join(upload_dir, filename)
+                    if os.path.isfile(file_path):
+                        # Check if file was created around the same time
+                        file_mtime = os.path.getmtime(file_path)
+                        if abs(file_mtime - upload_time) < 10:  # Within 10 seconds
+                            try:
+                                os.remove(file_path)
+                            except OSError as e:
+                                print(f"Error deleting upload file {filename}: {e}")
+            except Exception as e:
+                print(f"Error cleaning upload directory: {e}")
+
+        # Return the file for download
+        response = HttpResponse(file_content, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{compression_result.compressed_filename}"'
+        return response
 
     except (File.DoesNotExist, CompressionResult.DoesNotExist):
-        raise Http404("File not found")
+        messages.error(request, "File not found.")
+        return redirect('dashboard')
 
 
 @login_required

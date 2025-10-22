@@ -22,6 +22,8 @@ class CompressionResult(models.Model):
     compression_time = models.FloatField()  # Time in seconds
     download_link = models.CharField(max_length=500)  # URL for download
     timestamp = models.DateTimeField(default=timezone.now)
+    downloaded = models.BooleanField(default=False)  # Track if file has been downloaded
+    downloaded_at = models.DateTimeField(null=True, blank=True)  # When file was downloaded
 
     def __str__(self):
         return f"Compression of {self.file.original_filename}"

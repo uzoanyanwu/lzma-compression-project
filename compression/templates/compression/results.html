@@ -12,6 +12,27 @@
       </a>
     </div>
 
+    {% if result.downloaded %}
+    <!-- Already Downloaded Warning -->
+    <div class="mx-4 mb-4">
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">File Already Downloaded</h3>
+            <div class="mt-2 text-sm text-yellow-700">
+              <p>This file was downloaded on {{ result.downloaded_at|date:"F d, Y \a\t g:i A" }}. For security and privacy reasons, the files have been automatically deleted from our servers after the first download.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
             <!-- File Info -->
             <div class="px-4 pb-3">
               <div class="bg-[#f8fafc] rounded-lg p-4 border border-[#e1e7ef]">
@@ -110,16 +131,25 @@
             </div>
 
             <div class="flex px-4 py-3 justify-start gap-3">
-              <a href="{% url 'download_compressed_file' result.file.id %}"
+              {% if result.downloaded %}
+              <button disabled
+                class="flex min-w-[84px] max-w-[480px] cursor-not-allowed items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-300 text-gray-500 text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">File Already Downloaded</span>
+              </button>
+              {% else %}
+              <a id="downloadButton" href="{% url 'download_compressed_file' result.file.id %}"
+                onclick="handleDownload(event)"
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#2d78d4] transition-colors"
               >
                 <span class="truncate">Download Compressed File</span>
               </a>
-              <button onclick="copyDownloadLink()"
+              <button id="copyLinkButton" onclick="copyDownloadLink()"
                 class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors"
               >
                 <span class="truncate">Copy Download Link</span>
               </button>
+              {% endif %}
             </div>
 
   </div>
@@ -128,6 +158,60 @@
 
 {% block scripts %}
 <script>
+  function handleDownload(event) {
+    // Get the download button
+    const downloadButton = document.getElementById('downloadButton');
+    const copyLinkButton = document.getElementById('copyLinkButton');
+
+    // Disable the button immediately
+    downloadButton.onclick = null;
+    downloadButton.style.pointerEvents = 'none';
+    downloadButton.classList.remove('hover:bg-[#2d78d4]', 'cursor-pointer', 'bg-[#3d98f4]');
+    downloadButton.classList.add('cursor-not-allowed', 'bg-gray-300', 'text-gray-500');
+    downloadButton.querySelector('span').textContent = 'Downloading...';
+
+    // Also disable the copy link button
+    if (copyLinkButton) {
+      copyLinkButton.disabled = true;
+      copyLinkButton.classList.add('opacity-50', 'cursor-not-allowed');
+      copyLinkButton.style.pointerEvents = 'none';
+    }
+
+    // After a short delay, update the button text
+    setTimeout(() => {
+      downloadButton.querySelector('span').textContent = 'File Downloaded & Deleted';
+
+      // Show a notice that the file has been deleted
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'mx-4 mt-4';
+      warningDiv.innerHTML = `
+        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-green-800">Download Complete</h3>
+              <div class="mt-2 text-sm text-green-700">
+                <p>Your file has been downloaded successfully. For security and privacy reasons, the files have been automatically deleted from our servers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Insert the notice after the header
+      const contentContainer = document.querySelector('.layout-content-container');
+      const header = contentContainer.querySelector('.flex.flex-wrap.justify-between');
+      header.parentNode.insertBefore(warningDiv, header.nextSibling);
+    }, 1500); // Wait 1.5 seconds to simulate download start
+
+    // Let the download proceed normally
+    return true;
+  }
+
   function copyDownloadLink() {
     const downloadUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'download_compressed_file' result.file.id %}";
     navigator.clipboard.writeText(downloadUrl).then(() => {
