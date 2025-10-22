@@ -7,10 +7,10 @@
   {% csrf_token %}
   <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
     <label class="flex flex-col min-w-40 flex-1">
-      <p class="text-[#111418] text-base font-medium leading-normal pb-2">Username</p>
-      {{ form.username|addclass:"form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-14 placeholder:text-[#60758a] p-[15px] text-base font-normal leading-normal" }}
-      {% if form.username.errors %}
-        {% for error in form.username.errors %}
+      <p class="text-[#111418] text-base font-medium leading-normal pb-2">Email</p>
+      {{ form.email|addclass:"form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111418] focus:outline-0 focus:ring-0 border border-[#dbe0e6] bg-white focus:border-[#dbe0e6] h-14 placeholder:text-[#60758a] p-[15px] text-base font-normal leading-normal" }}
+      {% if form.email.errors %}
+        {% for error in form.email.errors %}
           <p class="text-red-500 text-sm mt-1">{{ error }}</p>
         {% endfor %}
       {% endif %}
