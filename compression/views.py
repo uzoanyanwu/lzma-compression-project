@@ -260,8 +260,16 @@ def download_compressed_file(request, file_id):
         )
 
         if not os.path.exists(compressed_path):
-            messages.error(request, "Compressed file not found on server.")
-            return redirect('dashboard')
+            # Mark as downloaded to prevent future download attempts
+            compression_result.downloaded = True
+            compression_result.downloaded_at = timezone.now()
+            compression_result.save()
+
+            messages.error(
+                request,
+                "Compressed file not found on server. The file may have been deleted or moved. "
+            )
+            return redirect('all_results')
 
         # Read file content before deletion
         with open(compressed_path, 'rb') as f:
