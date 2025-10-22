@@ -33,11 +33,11 @@ def handle_file_upload(request):
     files = request.FILES.getlist('files')
     total_size = sum(file.size for file in files)
 
-    # Check total file size limit (500MB)
-    max_size = 500 * 1024 * 1024  # 500MB in bytes
+    # Check total file size limit (100MB)
+    max_size = 100 * 1024 * 1024  # 100MB in bytes
     if total_size > max_size:
         return JsonResponse({
-            'error': f'Total file size ({total_size / (1024*1024):.2f} MB) exceeds maximum limit of 500MB'
+            'error': f'Total file size ({total_size / (1024*1024):.2f} MB) exceeds maximum limit of 100MB'
         }, status=400)
 
     try:
