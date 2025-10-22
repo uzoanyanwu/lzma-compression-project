@@ -7,9 +7,14 @@
   <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
     <div class="flex flex-wrap justify-between gap-3 p-4">
       <p class="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">Compression Results</p>
-      <a href="{% url 'dashboard' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors">
-        <span class="truncate">Compress More Files</span>
-      </a>
+      <div class="flex gap-2">
+        <a href="{% url 'all_results' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors">
+          <span class="truncate">View All Results</span>
+        </a>
+        <a href="{% url 'dashboard' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#f0f2f5] text-[#111418] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#e1e7ef] transition-colors">
+          <span class="truncate">Compress More Files</span>
+        </a>
+      </div>
     </div>
 
     {% if result.downloaded %}

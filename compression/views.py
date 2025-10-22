@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
 import lzma
 import time
@@ -210,6 +211,31 @@ def compression_results(request, result_id):
         raise Http404("Compression result not found")
 
 
+@login_required
+def all_results(request):
+    """Display all compression results for the user with pagination"""
+    # Get all results ordered by most recent first
+    all_results = CompressionResult.objects.filter(
+        file__user=request.user
+    ).select_related('file').order_by('-timestamp')
+
+    # Simple pagination with 10 items per page
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(all_results, 10)  # 10 items per page
+
+    try:
+        results_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        results_page = paginator.page(1)
+    except EmptyPage:
+        results_page = paginator.page(paginator.num_pages)
+
+    context = {
+        'results': results_page,
+        'total_count': all_results.count(),
+    }
+
+    return render(request, 'compression/all_results.html', context)
 @login_required
 def download_compressed_file(request, file_id):
     """Handle download of compressed files"""

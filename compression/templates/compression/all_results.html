@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}My Compression Results - DataCompress{% endblock %}
+
+{% block content %}
+<div class="px-40 flex flex-1 justify-center py-5">
+  <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+    <div class="flex flex-wrap justify-between gap-3 p-4">
+      <div>
+        <p class="text-[#111418] tracking-light text-[32px] font-bold leading-tight min-w-72">My Compression Results</p>
+        <p class="text-[#60758a] text-sm mt-1">View and download your compressed files</p>
+      </div>
+      <a href="{% url 'dashboard' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#3d98f4] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#2d78d4] transition-colors">
+        <span class="truncate">Compress New Files</span>
+      </a>
+    </div>
+
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="mx-4 mb-4">
+      {% for message in messages %}
+      <div class="{% if message.tags == 'error' %}bg-red-50 border-l-4 border-red-400{% elif message.tags == 'warning' %}bg-yellow-50 border-l-4 border-yellow-400{% elif message.tags == 'success' %}bg-green-50 border-l-4 border-green-400{% else %}bg-blue-50 border-l-4 border-blue-400{% endif %} p-4 rounded mb-2">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 {% if message.tags == 'error' %}text-red-400{% elif message.tags == 'warning' %}text-yellow-400{% elif message.tags == 'success' %}text-green-400{% else %}text-blue-400{% endif %}" viewBox="0 0 20 20" fill="currentColor">
+              {% if message.tags == 'error' %}
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              {% elif message.tags == 'warning' %}
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              {% elif message.tags == 'success' %}
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              {% else %}
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              {% endif %}
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm {% if message.tags == 'error' %}text-red-800{% elif message.tags == 'warning' %}text-yellow-800{% elif message.tags == 'success' %}text-green-800{% else %}text-blue-800{% endif %}">
+              {{ message }}
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Summary Stats -->
+    <div class="px-4 pb-4">
+      <div class="bg-[#f8fafc] rounded-lg p-4 border border-[#e1e7ef]">
+        <p class="text-[#60758a] text-sm">Total Compressions</p>
+        <p class="text-[#111418] text-2xl font-bold mt-1">{{ total_count }}</p>
+      </div>
+    </div>
+
+    {% if results %}
+    <!-- Results List -->
+    <div class="px-4 pb-4">
+      <h2 class="text-[#111418] text-xl font-bold mb-3">All Results</h2>
+      <div class="space-y-3">
+        {% for result in results %}
+        <div class="bg-white rounded-lg border border-[#e1e7ef] hover:border-[#3d98f4] hover:shadow-md transition-all">
+          <a href="{% url 'compression_results' result.id %}" class="block p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4 flex-1">
+                <div class="{% if result.downloaded %}text-gray-400{% else %}text-[#3d98f4]{% endif %}">
+                  <svg width="40" height="40" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM152,88V44l44,44Z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="{% if result.downloaded %}text-gray-600{% else %}text-[#111418]{% endif %} font-medium text-lg truncate">{{ result.file.original_filename }}</p>
+                  <p class="{% if result.downloaded %}text-gray-500{% else %}text-[#60758a]{% endif %} text-sm">{{ result.compressed_filename }}</p>
+                  <div class="flex items-center gap-4 mt-2 text-sm">
+                    <span class="{% if result.downloaded %}text-gray-500{% else %}text-[#60758a]{% endif %}">
+                      {% load custom_filters %}
+                      {{ result.file.original_file_size|filesizeformat }} → {{ result.compressed_file_size|filesizeformat }}
+                    </span>
+                    <span class="{% if result.downloaded %}text-gray-600{% else %}text-green-600{% endif %} font-medium">
+                      {{ result.compression_percentage }}% reduction
+                    </span>
+                    <span class="{% if result.downloaded %}text-gray-500{% else %}text-[#60758a]{% endif %}">
+                      {% if result.downloaded %}
+                        Downloaded: {{ result.downloaded_at|date:"M d, Y" }}
+                      {% else %}
+                        {{ result.timestamp|date:"M d, Y" }}
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                {% if result.downloaded %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                  Deleted
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Available
+                </span>
+                {% endif %}
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 256 256" class="text-[#60758a]">
+                  <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+                </svg>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if results.has_other_pages %}
+      <div class="mt-6 flex items-center justify-between">
+        <div class="text-sm text-[#60758a]">
+          Showing {{ results.start_index }} to {{ results.end_index }} of {{ total_count }} results
+        </div>
+        <div class="flex gap-2">
+          {% if results.has_previous %}
+          <a href="?page=1" 
+             class="px-3 py-2 rounded border border-[#e1e7ef] text-[#111418] hover:bg-[#f0f2f5] transition-colors text-sm">
+            First
+          </a>
+          <a href="?page={{ results.previous_page_number }}" 
+             class="px-3 py-2 rounded border border-[#e1e7ef] text-[#111418] hover:bg-[#f0f2f5] transition-colors text-sm">
+            Previous
+          </a>
+          {% endif %}
+
+          <span class="px-3 py-2 rounded bg-[#3d98f4] text-white font-medium text-sm">
+            Page {{ results.number }} of {{ results.paginator.num_pages }}
+          </span>
+
+          {% if results.has_next %}
+          <a href="?page={{ results.next_page_number }}" 
+             class="px-3 py-2 rounded border border-[#e1e7ef] text-[#111418] hover:bg-[#f0f2f5] transition-colors text-sm">
+            Next
+          </a>
+          <a href="?page={{ results.paginator.num_pages }}" 
+             class="px-3 py-2 rounded border border-[#e1e7ef] text-[#111418] hover:bg-[#f0f2f5] transition-colors text-sm">
+            Last
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="px-4 py-12">
+      <div class="text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No compression results</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by compressing your first file.</p>
+        <div class="mt-6">
+          <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#3d98f4] hover:bg-[#2d78d4]">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 256 256">
+              <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM152,88V44l44,44Z"></path>
+            </svg>
+            Compress Files
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
