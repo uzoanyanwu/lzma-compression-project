@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from .email_backend import InMemoryEmailBackend
 
 
 class EmailAuthenticationForm(forms.Form):
@@ -133,4 +134,13 @@ def signup(request):
     else:
         form = CustomUserCreationForm()
     return render(request, "users/signup.html", {"form": form})
+
+
+def view_reset_email(request):
+    """
+    Display the latest password reset email.
+    This is for development/demo purposes only.
+    """
+    email = InMemoryEmailBackend.get_latest_email()
+    return render(request, 'users/view_reset_email.html', {'email': email})
 

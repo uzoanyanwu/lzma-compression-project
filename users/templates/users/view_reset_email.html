@@ -1,0 +1,56 @@
+{% extends 'base_form.html' %}
+
+{% block title %}Password Reset Email{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📧 Password Reset Email</h4>
+                </div>
+                <div class="card-body">
+                    {% if email %}
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> This page displays the password reset email for demonstration purposes.
+                            In production, this would be sent to your actual email address.
+                        </div>
+
+                        <div class="email-details mb-4">
+                            <div class="mb-3">
+                                <strong>Subject:</strong>
+                                <p class="mb-0">{{ email.subject }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>To:</strong>
+                                <p class="mb-0">{{ email.to|join:", " }}</p>
+                            </div>
+                            <hr>
+                        </div>
+
+                        <div class="email-body p-3 bg-light border rounded">
+                            <pre style="white-space: pre-wrap; font-family: inherit;">{{ email.body }}</pre>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="{% url 'login' %}" class="btn btn-primary">Back to Login</a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading">No email found</h5>
+                            <p class="mb-0">There is no password reset email to display. Please request a password reset first.</p>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="{% url 'password_reset' %}" class="btn btn-warning mb-2 text-dark font-weight-bold">🔄 Request Password Reset</a>
+                            <br>
+                            <a href="{% url 'login' %}" class="btn btn-primary">🔐 Back to Login</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
