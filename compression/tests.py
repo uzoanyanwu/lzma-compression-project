@@ -119,7 +119,7 @@ class CompressionViewsTestCase(TestCase):
         """Test file upload size limit"""
         self.client.login(username='testuser', password='testpass123')
 
-        # Create a file larger than 500MB (simulate with size)
+        # Create a file larger than 100MB (simulate with size)
         large_content = b'x' * (501 * 1024 * 1024)  # 501MB
         large_file = SimpleUploadedFile(
             "large_test.txt",
