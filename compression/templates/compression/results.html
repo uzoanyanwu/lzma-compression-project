@@ -72,9 +72,19 @@
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
                 <p class="text-[#60758a] text-sm font-normal leading-normal">Compression Ratio</p>
                 <p class="text-[#111418] text-sm font-normal leading-normal">
-                  <span class="{% if result.compression_percentage > 0 %}text-green-600{% else %}text-red-600{% endif %} font-medium">
+                  {% if result.compression_percentage > 0 %}
+                  <span class="text-green-600 font-medium">
                     {{ result.compression_percentage }}% reduction
                   </span>
+                  {% elif result.compression_percentage == 0 %}
+                  <span class="text-gray-600 font-medium">
+                    No change (file already compressed)
+                  </span>
+                  {% else %}
+                  <span class="text-orange-600 font-medium">
+                    {{ result.compression_percentage|cut:"-" }}% larger (file already compressed)
+                  </span>
+                  {% endif %}
                 </p>
               </div>
               <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#dbe0e6] py-5">
@@ -89,13 +99,17 @@
 
             <!-- Compression Statistics -->
             <div class="px-4 pb-4">
-              <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
+              <div class="bg-gradient-to-r {% if result.compression_percentage > 0 %}from-green-50 to-blue-50 border-green-200{% else %}from-orange-50 to-yellow-50 border-orange-200{% endif %} rounded-lg p-4 border">
                 <h4 class="text-[#111418] font-medium mb-2">Compression Statistics</h4>
                 <div class="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p class="text-[#60758a]">Space Saved:</p>
+                    <p class="text-[#60758a]">{% if result.compression_percentage >= 0 %}Space Saved:{% else %}Size Increase:{% endif %}</p>
                     <p class="text-[#111418] font-medium">
+                      {% if result.compression_percentage >= 0 %}
                       {{ result.file.original_file_size|subtract:result.compressed_file_size|filesizeformat }}
+                      {% else %}
+                      {{ result.compressed_file_size|subtract:result.file.original_file_size|filesizeformat }}
+                      {% endif %}
                     </p>
                   </div>
                   <div>
@@ -103,6 +117,11 @@
                     <p class="text-[#111418] font-medium">LZMA (Preset 6)</p>
                   </div>
                 </div>
+                {% if result.compression_percentage <= 0 %}
+                <div class="mt-3 text-xs text-orange-700 bg-orange-100 p-2 rounded">
+                  <strong>Note:</strong> This file is already compressed and cannot be reduced further. LZMA added minimal overhead.
+                </div>
+                {% endif %}
               </div>
             </div>
 

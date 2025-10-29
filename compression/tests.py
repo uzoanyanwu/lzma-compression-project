@@ -13,7 +13,8 @@ from .models import File, CompressionResult
 class CompressionModelsTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username='testuser',
+            username='testuser@example.com',
+            email='testuser@example.com',
             password='testpass123'
         )
 
@@ -29,7 +30,7 @@ class CompressionModelsTestCase(TestCase):
         self.assertEqual(file_obj.user, self.user)
         self.assertEqual(file_obj.original_filename, 'test.txt')
         self.assertEqual(file_obj.original_file_size, 1024)
-        self.assertEqual(str(file_obj), 'test.txt - testuser')
+        self.assertEqual(str(file_obj), 'test.txt - testuser@example.com')
 
     def test_compression_result_model_creation(self):
         """Test CompressionResult model creation"""
@@ -81,7 +82,8 @@ class CompressionViewsTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username='testuser',
+            username='testuser@example.com',
+            email='testuser@example.com',
             password='testpass123'
         )
 
@@ -101,14 +103,14 @@ class CompressionViewsTestCase(TestCase):
 
     def test_dashboard_get_request(self):
         """Test dashboard GET request for authenticated user"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Compress Files')
 
     def test_file_upload_no_files(self):
         """Test file upload with no files"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
         response = self.client.post(reverse('dashboard'))
         self.assertEqual(response.status_code, 400)
         data = response.json()
@@ -117,7 +119,7 @@ class CompressionViewsTestCase(TestCase):
 
     def test_file_upload_size_limit(self):
         """Test file upload size limit"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
 
         # Create a file larger than 100MB (simulate with size)
         large_content = b'x' * (501 * 1024 * 1024)  # 501MB
@@ -135,7 +137,7 @@ class CompressionViewsTestCase(TestCase):
 
     def test_successful_single_file_upload_and_compression(self):
         """Test successful single file upload and compression"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
 
         # Create a test file
         test_content = b'This is test content for compression testing. ' * 100  # Make it larger
@@ -164,9 +166,12 @@ class CompressionViewsTestCase(TestCase):
         self.assertEqual(compression_result.file, file_obj)
         self.assertTrue(compression_result.compressed_filename.endswith('.xz'))
 
+        # Verify original uploaded file was deleted after compression
+        self.assertFalse(os.path.exists(file_obj.file_path))
+
     def test_successful_multiple_file_upload_and_compression(self):
         """Test successful multiple file upload and compression"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
 
         # Create multiple test files
         test_files = []
@@ -191,7 +196,7 @@ class CompressionViewsTestCase(TestCase):
 
     def test_compression_results_view(self):
         """Test compression results view"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
 
         # Create test data
         file_obj = File.objects.create(
@@ -222,7 +227,8 @@ class CompressionViewsTestCase(TestCase):
         """Test that users can only access their own compression results"""
         # Create another user
         other_user = User.objects.create_user(
-            username='otheruser',
+            username='otheruser@example.com',
+            email='otheruser@example.com',
             password='otherpass123'
         )
 
@@ -244,7 +250,7 @@ class CompressionViewsTestCase(TestCase):
         )
 
         # Try to access as different user
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
         response = self.client.get(
             reverse('compression_results', kwargs={'result_id': compression_result.id})
         )
@@ -254,7 +260,8 @@ class CompressionViewsTestCase(TestCase):
 class CompressionFunctionalityTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username='testuser',
+            username='testuser@example.com',
+            email='testuser@example.com',
             password='testpass123'
         )
 
@@ -316,7 +323,8 @@ class CompressionIntegrationTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username='testuser',
+            username='testuser@example.com',
+            email='testuser@example.com',
             password='testpass123'
         )
 
@@ -330,7 +338,7 @@ class CompressionIntegrationTestCase(TestCase):
 
     def test_complete_compression_workflow(self):
         """Test the complete workflow from upload to download"""
-        self.client.login(username='testuser', password='testpass123')
+        self.client.login(username='testuser@example.com', password='testpass123')
 
         # Step 1: Upload file
         test_content = b'This is test content for full workflow testing. ' * 100
@@ -355,6 +363,18 @@ class CompressionIntegrationTestCase(TestCase):
 
         # Step 3: Download compressed file
         file_obj = compression_result.file
+
+        # Get the compressed file path before download
+        compressed_path = os.path.join(
+            settings.MEDIA_ROOT,
+            'compressed',
+            str(self.user.id),
+            compression_result.compressed_filename
+        )
+
+        # Verify compressed file exists before download
+        self.assertTrue(os.path.exists(compressed_path))
+
         download_response = self.client.get(
             reverse('download_compressed_file', kwargs={'file_id': file_obj.id})
         )
@@ -365,3 +385,11 @@ class CompressionIntegrationTestCase(TestCase):
         downloaded_content = download_response.content
         decompressed_content = lzma.decompress(downloaded_content)
         self.assertEqual(decompressed_content, test_content)
+
+        # Verify compressed file was deleted after download
+        self.assertFalse(os.path.exists(compressed_path))
+
+        # Verify compression result is marked as downloaded
+        compression_result.refresh_from_db()
+        self.assertTrue(compression_result.downloaded)
+        self.assertIsNotNone(compression_result.downloaded_at)

@@ -130,6 +130,10 @@ def compress_single_file(file_record):
         download_link=download_url
     )
 
+    # Delete the original uploaded file to save space
+    if os.path.exists(file_record.file_path):
+        os.remove(file_record.file_path)
+
     return compression_result
 
 
@@ -197,6 +201,11 @@ def compress_multiple_files(file_records):
         compression_time=compression_time,
         download_link=download_url
     )
+
+    # Delete all original uploaded files to save space
+    for file_record in file_records:
+        if os.path.exists(file_record.file_path):
+            os.remove(file_record.file_path)
 
     return compression_result
 
@@ -280,40 +289,11 @@ def download_compressed_file(request, file_id):
         compression_result.downloaded_at = timezone.now()
         compression_result.save()
 
-        # Delete the compressed file
+        # Delete the compressed file after reading
         try:
             os.remove(compressed_path)
         except OSError as e:
             print(f"Error deleting compressed file: {e}")
-
-        # Delete the original uploaded file(s)
-        # Check if this was a multiple file upload (file_path points to compressed file)
-        if file_record.file_path != compressed_path:
-            # Single file or individual files from multiple upload
-            if os.path.exists(file_record.file_path):
-                try:
-                    os.remove(file_record.file_path)
-                except OSError as e:
-                    print(f"Error deleting original file: {e}")
-
-        # For multiple file uploads, try to clean up the upload directory
-        upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploads', str(request.user.id))
-        if os.path.exists(upload_dir):
-            try:
-                # Remove any files that were uploaded at the same time (within 10 seconds)
-                upload_time = file_record.upload_timestamp.timestamp()
-                for filename in os.listdir(upload_dir):
-                    file_path = os.path.join(upload_dir, filename)
-                    if os.path.isfile(file_path):
-                        # Check if file was created around the same time
-                        file_mtime = os.path.getmtime(file_path)
-                        if abs(file_mtime - upload_time) < 10:  # Within 10 seconds
-                            try:
-                                os.remove(file_path)
-                            except OSError as e:
-                                print(f"Error deleting upload file {filename}: {e}")
-            except Exception as e:
-                print(f"Error cleaning upload directory: {e}")
 
         # Return the file for download
         response = HttpResponse(file_content, content_type='application/octet-stream')
