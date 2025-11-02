@@ -1,5 +1,10 @@
 from django.contrib import admin
 
+# Admin site branding
+admin.site.site_header = "DataCompress Administration"
+admin.site.site_title = "DataCompress Portal"
+admin.site.index_title = "Administration Dashboard"
+
 from .models import File, CompressionResult
 
 
