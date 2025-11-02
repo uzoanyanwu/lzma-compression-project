@@ -3,7 +3,7 @@
   'use strict';
 
   let selectedFiles = [];
-  const maxSize = 100 * 1024 * 1024; // 100MB
+  const maxSize = 50 * 1024 * 1024; // 50MB
 
   // Get DOM elements
   const dropZone = document.getElementById('dropZone');
@@ -100,7 +100,7 @@
     // Check total size
     const totalSize = [...selectedFiles, ...newFiles].reduce((sum, file) => sum + file.size, 0);
     if (totalSize > maxSize) {
-      showError(`Total file size (${(totalSize / (1024*1024)).toFixed(2)} MB) exceeds maximum limit of 100MB`);
+      showError(`Total file size (${(totalSize / (1024*1024)).toFixed(2)} MB) exceeds maximum limit of 50MB`);
       return;
     }
 
@@ -154,7 +154,7 @@
     const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
     const totalSizeElement = document.createElement('div');
     totalSizeElement.className = 'mt-2 text-[#60758a] text-sm';
-    totalSizeElement.textContent = `Total size: ${formatFileSize(totalSize)} / 100MB`;
+    totalSizeElement.textContent = `Total size: ${formatFileSize(totalSize)} / 50MB`;
     fileItems.appendChild(totalSizeElement);
   }
 

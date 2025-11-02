@@ -20,7 +20,7 @@ A Django-based web application for compressing large-scale datasets using the LZ
 
 - **File Upload & Management**:
   - Single and multiple file upload support
-  - Maximum upload size: 100MB total per compression session
+  - Maximum upload size: 50MB total per compression session
   - User-specific storage directories
   - Automatic file cleanup after download for security
 

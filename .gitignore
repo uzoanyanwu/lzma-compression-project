@@ -14,6 +14,8 @@ media/
 
 # Local Settings / Secrets
 local_settings.py
+.env
+.env.local
 
 # Log Files
 *.log
