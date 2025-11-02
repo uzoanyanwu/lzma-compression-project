@@ -103,6 +103,25 @@ PYTHONANYWHERE_DOMAIN = os.getenv('PYTHONANYWHERE_DOMAIN')
 
 # Use MySQL on PythonAnywhere, SQLite locally
 if PYTHONANYWHERE_DOMAIN:
+    # Read DB env vars into local variables first so we can validate them
+    DB_NAME = os.getenv('DB_NAME')
+    DB_USER = os.getenv('DB_USER')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_HOST = os.getenv('DB_HOST')
+
+    # Fail fast with a clear message if any required DB env var is missing
+    missing = [name for name, val in (
+        ('DB_NAME', DB_NAME),
+        ('DB_USER', DB_USER),
+        ('DB_PASSWORD', DB_PASSWORD),
+        ('DB_HOST', DB_HOST),
+    ) if not val]
+    if missing:
+        raise ValueError(
+            "Missing required database environment variables for PythonAnywhere: "
+            + ", ".join(missing)
+        )
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -110,6 +129,10 @@ if PYTHONANYWHERE_DOMAIN:
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': os.getenv('DB_HOST'),
+            'OPTIONS': {
+                # Set session sql_mode to include strict mode — prevents silent truncation
+                'init_command': "SET SESSION sql_mode='STRICT_TRANS_TABLES'",
+            },
         }
     }
 else:
