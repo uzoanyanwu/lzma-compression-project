@@ -1,20 +1,18 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse, Http404
+import lzma
+import os
+import tempfile
+import time
+import zipfile
+
 from django.conf import settings
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse, HttpResponse, Http404
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import os
-import lzma
-import time
-import json
-import tempfile
-import zipfile
-from pathlib import Path
+
 from .models import File, CompressionResult
 
 
@@ -245,6 +243,7 @@ def all_results(request):
     }
 
     return render(request, 'compression/all_results.html', context)
+
 @login_required
 def download_compressed_file(request, file_id):
     """Handle download of compressed files"""

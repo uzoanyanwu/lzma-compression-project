@@ -1,12 +1,14 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.conf import settings
-import os
-import tempfile
-import shutil
 import lzma
+import os
+import shutil
+import tempfile
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, Client
+from django.urls import reverse
+
 from .models import File, CompressionResult
 
 

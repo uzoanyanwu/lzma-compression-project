@@ -2,9 +2,9 @@
 Custom email backend that stores emails in memory for display on a web page.
 This is for development/demo purposes only.
 """
-from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives
+from django.core.mail.backends.base import BaseEmailBackend
 
 
 class InMemoryEmailBackend(BaseEmailBackend):
