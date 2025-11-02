@@ -98,12 +98,28 @@ WSGI_APPLICATION = 'compressor.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Check if running on PythonAnywhere
+PYTHONANYWHERE_DOMAIN = os.getenv('PYTHONANYWHERE_DOMAIN')
+
+# Use MySQL on PythonAnywhere, SQLite locally
+if PYTHONANYWHERE_DOMAIN:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+        }
     }
-}
+else:
+    # Local development uses SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -160,10 +176,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024   # 50MB
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Additional settings for production deployment to pythonanywhere
-domain = os.getenv('PYTHONANYWHERE_DOMAIN')
-if domain:
+if PYTHONANYWHERE_DOMAIN:
     DEBUG = False
-    ALLOWED_HOSTS = [domain, f'www.{domain}']
+    ALLOWED_HOSTS = [PYTHONANYWHERE_DOMAIN, f'www.{PYTHONANYWHERE_DOMAIN}']
 
     # Security settings for production
     SECURE_SSL_REDIRECT = True
